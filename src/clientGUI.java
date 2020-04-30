@@ -6,9 +6,14 @@ public class clientGUI extends javax.swing.JFrame {
     /**
      * Creates new form clientGUI
      */
+    private String message = "";
+    private boolean firstTime = true;
+    private static Client client;
+    private static clientGUI gui;
     public clientGUI() {
         initComponents();
         inputTextField.requestFocusInWindow();
+
     }
 
     /**
@@ -112,30 +117,41 @@ public class clientGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void sendButtonClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendButtonClicked
-        if (chatBox.getText().equals("")) {
-            chatBox.setText(inputTextField.getText());
-        } else {
-            chatBox.setText(chatBox.getText() + "\n" + inputTextField.getText());
-        }
-        inputTextField.setText("");
+       sendMsg();
     }//GEN-LAST:event_sendButtonClicked
 
     private void inputTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputTextFieldKeyPressed
         int key = evt.getKeyCode();
         if (key == KeyEvent.VK_ENTER) {
-            if (chatBox.getText().equals("")) {
-                chatBox.setText(inputTextField.getText());
-            } else {
-                chatBox.setText(chatBox.getText() + "\n" + inputTextField.getText());
-            }
-            inputTextField.setText("");
+            sendMsg();
         }
     }//GEN-LAST:event_inputTextFieldKeyPressed
 
+    protected void sendMsg(){
+        message = inputTextField.getText();
+        inputTextField.setText("");
+        if(!message.equals("")) {
+            if (firstTime) {
+                client.initialSetup(gui, message);
+                firstTime = false;
+            }
+            else
+                client.outgoingChat(message);
+            message = "";
+        }
+    }
+
+    protected void setChatText(String text) {
+        chatBox.setText(chatBox.getText() + "\n" + text);
+    }
+
+    protected void setView(){
+        jScrollPane1.setViewportView(chatBox);
+    }
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]){
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -160,11 +176,17 @@ public class clientGUI extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+        gui = new clientGUI();
+        client = new Client();
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new clientGUI().setVisible(true);
+                //new clientGUI().setVisible(true);
+                gui.setVisible(true);
             }
         });
+        client.start();
+        gui.setChatText("You are attempting to connect to the chatroom...");
+        gui.setChatText("Enter a username: ");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

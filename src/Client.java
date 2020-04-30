@@ -10,15 +10,16 @@ public class Client {
     private BufferedReader inFromUser;
     private boolean isConnected = false;
 
+    /*
     public static void main(String[] args) {
         Client client = new Client();
         client.start();
         client.initialSetup();
         client.outgoingChat();
-    }
+    }*/
 
     // Starts TCP connection with server
-    private void start() {
+    protected void start() {
         try {
             socket = new Socket(HOSTNAME, PORT);
             outToServer = new PrintWriter(socket.getOutputStream(), true);
@@ -30,16 +31,13 @@ public class Client {
     }
 
     // Prompts user for username and sends to server, waits for confirmation message
-    private void initialSetup() {
-        System.out.println("You are attempting to connect to the chatroom...");
-        System.out.print("Enter a username: ");
+    protected void initialSetup(clientGUI gui, String username){
         try {
-            String username = inFromUser.readLine();
-            outToServer.println(username); 
-            System.out.println(inFromServer.readLine());  // Welcome message
-            System.out.println("> You can begin sending messages...");
-            
-            ChatListener cl = new ChatListener();
+            outToServer.println(username);
+            gui.setChatText(inFromServer.readLine());
+            gui.setChatText("> You can begin sending messages...");
+
+            ChatListener cl = new ChatListener(gui);
             cl.start();
             isConnected = true;
         } catch (IOException e) {
@@ -48,13 +46,13 @@ public class Client {
     }
 
     // Begin an endless loop of reading and sending the user's messages
-    private void outgoingChat() {
-        String receivedMsg;
-        while(isConnected) {
+    protected void outgoingChat(String receivedMsg) {
+        if(isConnected) {
             try {
-                receivedMsg = inFromUser.readLine();
-                // Received sign-out message
-                if(receivedMsg.equals(".")) {
+                if(receivedMsg == null){
+                }
+                //Received sign-out message
+                else if(receivedMsg.equals(".")) {
                     isConnected = false;
                     outToServer.println(receivedMsg);
                     socket.shutdownOutput();
@@ -75,7 +73,7 @@ public class Client {
     }
     
     // Close connection and socket
-    private void close() {
+    protected void close() {
         try {
             isConnected = false;
             inFromServer.close();
@@ -86,12 +84,19 @@ public class Client {
 
     // Continuously listens for other user's messages
     class ChatListener extends Thread {
+        clientGUI g;
+        public ChatListener(clientGUI g){
+            this.g = g;
+        }
         public void run() {
             String receivedMsg;
             while(isConnected) {
                 try {
                     receivedMsg = inFromServer.readLine();  
                     System.out.println(receivedMsg);
+                    g.setChatText(receivedMsg);
+                    g.setView();
+
                 } catch (Exception e) {
                     System.out.println("Server has encountered an error. Disconnecting...");
                     close();
