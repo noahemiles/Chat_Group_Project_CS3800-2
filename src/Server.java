@@ -1,26 +1,31 @@
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.lang.reflect.Method;
 
 public class Server {
     private ArrayList<ServerThread> userList = new ArrayList<ServerThread>();
     private int userCount = 0;
     final int PORT = 2468;
-
+    ServerThread st;
+    ServerSocket serverSocket;
+/*
     public static void main(String[] args) {
         Server server = new Server();
         server.start();
     }
-
+*/
     // Setup socket, accept connection, spawn and add thread
-    private void start() {
+    protected void start(serverGUI gui) {
+        
         try {
-            ServerSocket serverSocket = new ServerSocket(PORT);
+            serverSocket = new ServerSocket(PORT);
+            gui.setChatText("Server is waiting for connections...");
             System.out.println("Server is waiting for connections...");
             while(true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Connection accepted...");
-                ServerThread st = new ServerThread(this, clientSocket);
+                gui.setChatText("Connection accepted...");
+                st = new ServerThread(this, clientSocket, gui);
                 userList.add(st);
                 userCount++;
                 st.start();
@@ -39,7 +44,14 @@ public class Server {
         }
         return -1;
     }
-
+    
+    public ArrayList<ServerThread> onlineUsers() {
+        return userList;
+    }
+    
+    public int getUserCount() {
+        return userCount;
+    }
     // Removes user from userList
     synchronized void removeUser(String username) {
         int index = findClientByName(username);

@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class ServerThread extends Thread {
     private final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
@@ -11,12 +12,13 @@ public class ServerThread extends Thread {
     private PrintWriter outToClient;
     private String username;
     private boolean isConnected;
-
+    serverGUI g;
+    
     // Constructor
-    public ServerThread(Server server, Socket clientSocket) {
+    public ServerThread(Server server, Socket clientSocket, serverGUI sgui) {
         this.server = server;
         this.clientSocket = clientSocket;
-
+        this.g = sgui;
         try {
             inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             outToClient = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -29,7 +31,7 @@ public class ServerThread extends Thread {
     public void run() {
         // Setup for a new user
         handleNewUser();
-
+        
         String receivedMsg;
         // Keep reading messages till socket/stream is closed
         while (isConnected) {
@@ -78,10 +80,13 @@ public class ServerThread extends Thread {
     // Send the message to the client, if fail let parent server know
     void sendMsg(String msg) {
         try {
+            //gui.setChatText("Attempting to send this message: " + msg);
             System.out.println("Attempting to send this message: " + msg); //--------------------TEST-----------------------
+            g.setChatText("Attempting to send this message: " + msg);
             // Client is connected, send message
             outToClient.println(msg);
             System.out.println("Message has been sent!"); //--------------------TEST-----------------------
+            g.setChatText("Message has been sent!");
         } catch (Exception e) {
             // Found a client that was disconnected without logout
             // Remove the user server's userList and close connection
@@ -107,7 +112,7 @@ public class ServerThread extends Thread {
     public String getUsername() {
         return username;
     }
-
+    
     // Sets username
     public void setUsername(String username) {
         this.username = username;

@@ -31,12 +31,10 @@ public class clientGUI extends javax.swing.JFrame {
         inputTextField = new javax.swing.JTextField();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
-        disconnectMenu = new javax.swing.JMenu();
         exitMenuItem = new javax.swing.JMenuItem();
-        disconnectMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("WLND's Chat ");
+        setTitle("Group Name's Chat ");
         setBackground(new java.awt.Color(0, 0, 0));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setLocation(new java.awt.Point(0, 0));
@@ -72,9 +70,6 @@ public class clientGUI extends javax.swing.JFrame {
         fileMenu.setMnemonic('f');
         fileMenu.setText("File");
 
-        disconnectMenu.setMnemonic('d');
-        disconnectMenu.setText("Disconnect");
-
         exitMenuItem.setMnemonic('x');
         exitMenuItem.setText("Exit");
         exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -82,18 +77,9 @@ public class clientGUI extends javax.swing.JFrame {
                 exitMenuItemActionPerformed(evt);
             }
         });
-        disconnectMenuItem.setMnemonic('d');
-        disconnectMenuItem.setText("Disconnect");
-        disconnectMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                disconnectMenuItemActionPerformed(evt);
-            }
-        });
         fileMenu.add(exitMenuItem);
-        disconnectMenu.add(disconnectMenuItem);
 
         menuBar.add(fileMenu);
-        menuBar.add(disconnectMenu);
 
         setJMenuBar(menuBar);
 
@@ -127,11 +113,7 @@ public class clientGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-	    System.exit(0);
-    }//GEN-LAST:event_exitMenuItemActionPerformed
-
-    private void disconnectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-	    client.outgoingChat(".");
+        System.exit(0);
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void sendButtonClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendButtonClicked
@@ -146,13 +128,12 @@ public class clientGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_inputTextFieldKeyPressed
 
     protected void sendMsg(){
-		message = inputTextField.getText();
+        message = inputTextField.getText();
         inputTextField.setText("");
         if(!message.equals("")) {
             if (firstTime) {
                 client.initialSetup(gui, message);
                 firstTime = false;
-        		setTitle("WLND's Chat | " + message);
             }
             else
                 client.outgoingChat(message);
@@ -162,8 +143,6 @@ public class clientGUI extends javax.swing.JFrame {
 
     protected void setChatText(String text) {
         chatBox.setText(chatBox.getText() + "\n" + text);
-        // auto scroll to bottom of JTextArea
-		chatBox.setCaretPosition(chatBox.getDocument().getLength() - 1);
     }
 
     protected void setView(){
@@ -213,9 +192,7 @@ public class clientGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatBox;
     private javax.swing.JMenuItem exitMenuItem;
-    private javax.swing.JMenuItem disconnectMenuItem;
     private javax.swing.JMenu fileMenu;
-    private javax.swing.JMenu disconnectMenu;
     private javax.swing.JTextField inputTextField;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenuBar menuBar;
